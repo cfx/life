@@ -32,6 +32,7 @@ window.addEventListener("load", function(event) {
     var cell = getCell(x, y)
     cell.state = state
 
+    return cell
   }
 
   var getCell = function(x, y) {
@@ -62,6 +63,9 @@ window.addEventListener("load", function(event) {
     }
   }
 
+  updateCell(3, 10, ALIVE)
+  updateCell(4, 10, ALIVE)
+  updateCell(5, 10, ALIVE)
 
   drawBoard()
   document.body.appendChild(cnv)
