@@ -14,19 +14,24 @@ window.addEventListener("load", function(event) {
 
   var ctx = cnv.getContext('2d');
   ctx.scale(10, 10);
-  ctx.fillStyle = 'black';
 
   // 0 - dead cell
   // 1 - alive cell
 
   let Board = []
 
-  var Cell = function(x, y, state) {
+  var createCell= function(x, y, state) {
     return {
       x: x,
       y: y,
       state: state
     }
+  }
+
+  var updateCell = function(x, y, state) {
+    var cell = getCell(x, y)
+    cell.state = state
+
   }
 
   var getCell = function(x, y) {
@@ -36,11 +41,28 @@ window.addEventListener("load", function(event) {
   for (let x = 0; x < WIDTH; x++) {
     let arrY = []
     for (let y = 0; y < HEIGHT; y++) {
-      arrY.push(Cell(x, y, DEAD))
+      arrY.push(createCell(x, y, DEAD))
     }
     Board.push(arrY)
   }
 
-  ctx.fillRect(1, 1, 1, 1);
+  var drawBoard = function() {
+    for (let x = 0; x < Board.length; x++) {
+      for (let y = 0; y < Board[x].length; y++) {
+	var cell = getCell(x, y)
+
+	if (cell.state === DEAD) {
+	  ctx.fillStyle = 'white';
+	} else {
+	  ctx.fillStyle = 'black';
+	}
+
+	ctx.fillRect(x, y, 1, 1);
+      }
+    }
+  }
+
+
+  drawBoard()
   document.body.appendChild(cnv)
 })
