@@ -24,27 +24,62 @@ window.addEventListener("load", function(event) {
     return {
       x: x,
       y: y,
-      state: state
+      state: state,
+      nextState: DEAD,
     }
   }
 
-  var updateCell = function(x, y, state) {
+  var updateCell = function(x, y, state, nextState) {
     var cell = getCell(x, y)
     cell.state = state
+    cell.nextState = nextState
 
     return cell
   }
 
   var getCell = function(x, y) {
-    return Board[x][y]
+    var row = Board[x]
+
+    if (row) {
+      var cell = row[y]
+      return cell ? cell : { state: DEAD}
+    } else {
+      return { state: DEAD }
+    }
   }
 
-  for (let x = 0; x < WIDTH; x++) {
-    let arrY = []
-    for (let y = 0; y < HEIGHT; y++) {
-      arrY.push(createCell(x, y, DEAD))
+  var resolveCell = function(x, y) {
+    var cell = getCell(x, y),
+	state = cell.state,
+
+	N  = getCell(x, y-1).state,
+	NE = getCell(x+1, y-1).state,
+	E  = getCell(x+1, y).state,
+	SE = getCell(x+1, y+1).state,
+	S  = getCell(x, y+1).state,
+	SW = getCell(x-1, y+1).state,
+	W =  getCell(x-1, y).state,
+	NW = getCell(x-1, y-1).state,
+
+	sum = N + NE + E + SE + S + SW + W + NW
+
+    if (sum === 2) {
+      return updateCell(x, y, state, state)
+    } else if (sum === 3) {
+      return updateCell(x, y, state, ALIVE)
+    } else {
+      return updateCell(x, y, state, DEAD)
     }
-    Board.push(arrY)
+  }
+
+  var createBoard = function() {
+    for (let x = 0; x < WIDTH; x++) {
+      let arrY = []
+      for (let y = 0; y < HEIGHT; y++) {
+        arrY.push(createCell(x, y, DEAD, DEAD))
+      }
+      Board.push(arrY)
+    }
   }
 
   var drawBoard = function() {
@@ -52,21 +87,39 @@ window.addEventListener("load", function(event) {
       for (let y = 0; y < Board[x].length; y++) {
 	var cell = getCell(x, y)
 
-	if (cell.state === DEAD) {
+	if (cell.nextState === DEAD) {
 	  ctx.fillStyle = 'white';
 	} else {
 	  ctx.fillStyle = 'black';
 	}
 
+	updateCell(x, y, cell.nextState, null)
 	ctx.fillRect(x, y, 1, 1);
       }
     }
   }
 
-  updateCell(3, 10, ALIVE)
-  updateCell(4, 10, ALIVE)
-  updateCell(5, 10, ALIVE)
+  var nextGeneration = function() {
+    for (let x = 0; x < Board.length; x++) {
+      for (let y = 0; y < Board[x].length; y++) {
+	resolveCell(x, y)
+      }
+    }
+
+    drawBoard()
+  }
+
+  createBoard()
+
+  updateCell(13, 15, DEAD, ALIVE)
+  updateCell(14, 15, DEAD, ALIVE)
+  updateCell(15, 15, DEAD, ALIVE)
+  updateCell(14, 16, DEAD, ALIVE)
 
   drawBoard()
   document.body.appendChild(cnv)
+
+  document.getElementById("next").addEventListener("click", function(e) {
+    nextGeneration()
+  })
 })
