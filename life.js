@@ -20,21 +20,13 @@ window.addEventListener("load", function(event) {
 
   let Board = []
 
-  var createCell= function(x, y, state) {
+  var createCell= function(x, y) {
     return {
       x: x,
       y: y,
-      state: state,
+      state: DEAD,
       nextState: DEAD,
     }
-  }
-
-  var updateCell = function(x, y, state, nextState) {
-    var cell = getCell(x, y)
-    cell.state = state
-    cell.nextState = nextState
-
-    return cell
   }
 
   var getCell = function(x, y) {
@@ -64,11 +56,10 @@ window.addEventListener("load", function(event) {
 	sum = N + NE + E + SE + S + SW + W + NW
 
     if (sum === 2) {
-      return updateCell(x, y, state, state)
     } else if (sum === 3) {
-      return updateCell(x, y, state, ALIVE)
+      cell.nextState = ALIVE
     } else {
-      return updateCell(x, y, state, DEAD)
+      cell.nextState = DEAD
     }
   }
 
@@ -76,7 +67,7 @@ window.addEventListener("load", function(event) {
     for (let x = 0; x < WIDTH; x++) {
       let arrY = []
       for (let y = 0; y < HEIGHT; y++) {
-        arrY.push(createCell(x, y, DEAD, DEAD))
+        arrY.push(createCell(x, y))
       }
       Board.push(arrY)
     }
@@ -93,7 +84,7 @@ window.addEventListener("load", function(event) {
 	  ctx.fillStyle = 'black';
 	}
 
-	updateCell(x, y, cell.nextState, null)
+	cell.state = cell.nextState
 	ctx.fillRect(x, y, 1, 1);
       }
     }
@@ -111,10 +102,10 @@ window.addEventListener("load", function(event) {
 
   createBoard()
 
-  updateCell(13, 15, DEAD, ALIVE)
-  updateCell(14, 15, DEAD, ALIVE)
-  updateCell(15, 15, DEAD, ALIVE)
-  updateCell(14, 16, DEAD, ALIVE)
+  getCell(13, 15).nextState = ALIVE
+  getCell(14, 15).nextState = ALIVE
+  getCell(15, 15).nextState = ALIVE
+  getCell(14, 16).nextState = ALIVE
 
   drawBoard()
   document.body.appendChild(cnv)
